@@ -60,10 +60,18 @@ class TransactionController extends Controller
     public function export(Request $request)
     {
         $query = Transaction::query();
+        $filename = 'transaction-export-' . now()->format('Y-m-d');
 
         if ($request->company_id) {
-            $query->where('company_id', $request->company_id);
+            $company = Company::find($request->company_id);
+            if ($company) {
+                $query->where('company_id', $request->company_id);
+                // Sanitize company name for filename
+                $safeName = str_replace([' ', '/', '\\'], '-', $company->name);
+                $filename = 'export-' . $safeName . '-' . now()->format('Y-m-d');
+            }
         }
+        
         if ($request->from_date) {
             $query->where('settlement_time', '>=', $request->from_date . ' 00:00:00');
         }
@@ -75,7 +83,7 @@ class TransactionController extends Controller
 
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="transaction-export-'.now()->format('Y-m-d').'.csv"',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '.csv"',
         ];
 
         $columns = [
