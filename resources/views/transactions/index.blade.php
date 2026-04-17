@@ -108,14 +108,23 @@
                 <!-- Filter & Export Card -->
                 <div class="card mb-4 mt-5">
                     <div class="card-body p-4">
-                        <div class="row align-items-end">
-                            <div class="col-md-3">
+                        <div class="row align-items-end g-2">
+                            <div class="col-md-4">
                                 <label class="form-label fw-semibold">Pilih Company</label>
                                 <select id="filter_company_id" class="form-select">
                                     <option value="">Semua Company</option>
                                     @foreach($companies as $company)
                                         <option value="{{ $company->id }}">{{ $company->name }}</option>
                                     @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Transaction Type</label>
+                                <select id="filter_transaction_type" class="form-select">
+                                    <option value="">Semua Type</option>
+                                    <option value="Withdrawal">Withdrawal</option>
+                                    <option value="Payment">Payment</option>
+                                    <option value="Disbursement">Disbursement</option>
                                 </select>
                             </div>
                             <div class="col-md-2">
@@ -126,11 +135,23 @@
                                 <label class="form-label fw-semibold">Hingga Tanggal</label>
                                 <input type="date" id="to_date" class="form-control">
                             </div>
-                            <div class="col-md-2">
-                                <button type="button" id="filter" class="btn btn-primary w-100 mb-0">Filter</button>
+                            <div class="col-md-1">
+                                <button type="button" id="filter" class="btn btn-primary w-100 mb-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                    </svg>
+                                </button>
                             </div>
-                            <div class="col-md-3">
-                                <button type="button" id="export" class="btn btn-outline-success w-100 mb-0">Export CSV</button>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <button type="button" id="export" class="btn btn-outline-success w-100 mb-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-spreadsheet me-2" viewBox="0 0 16 16">
+                                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                                        <path d="M5.186 9.857A.33.33 0 0 0 5 10.125v.564a.33.33 0 0 0 .186.297l.712.356a.33.33 0 0 0 .228.026l.712-.178a.33.33 0 0 0 .228-.426l-.356-.712a.33.33 0 0 0-.426-.228l-.712.178a.33.33 0 0 0-.228.426l.356.712a.33.33 0 0 0 .426.228l.712-.178a.33.33 0 0 0 .228-.426z"/>
+                                    </svg>
+                                    Export CSV Dengan Filter Di Atas
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -221,6 +242,7 @@
                     url: "/",
                     data: function (d) {
                         d.company_id = $('#filter_company_id').val();
+                        d.transaction_type = $('#filter_transaction_type').val();
                         d.from_date = $('#from_date').val();
                         d.to_date = $('#to_date').val();
                     }
@@ -246,9 +268,13 @@
 
             $('#export').click(function(){
                 var company_id = $('#filter_company_id').val();
+                var transaction_type = $('#filter_transaction_type').val();
                 var from_date = $('#from_date').val();
                 var to_date = $('#to_date').val();
-                window.location.href = "{{ route('transactions.export') }}?company_id=" + company_id + "&from_date=" + from_date + "&to_date=" + to_date;
+                window.location.href = "{{ route('transactions.export') }}?company_id=" + company_id + 
+                                       "&transaction_type=" + transaction_type + 
+                                       "&from_date=" + from_date + 
+                                       "&to_date=" + to_date;
             });
 
             // Drag and Drop Logic

@@ -81,6 +81,23 @@ class TransactionController extends Controller
 
         $transactions = $query->latest()->get();
 
+        $transctions_paid = Transaction::query();
+        if ($request->company_id) {
+            $transctions_paid->where('company_id', $request->company_id);
+        }
+        if ($request->from_date) {
+            $transctions_paid->where('date_created', '>=', $request->from_date . ' 00:00:00');
+        }
+        if ($request->to_date) {
+            $transctions_paid->where('date_created', '<=', $request->to_date . ' 23:59:59');
+        }
+        $transctions_paid->where('transaction_type', 'Withdrawal');
+
+        $transctions_paid = $transctions_paid->get();
+
+        // Gabungkan data Withdrawal ke dalam data Transactions utama
+        $transactions = $transactions->merge($transctions_paid)->sortByDesc('date_created');
+
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '.csv"',
